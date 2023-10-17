@@ -1,18 +1,15 @@
+use crate::NamedField;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
-use syn::punctuated::Punctuated;
-use syn::token::Comma;
-use syn::Field;
 
 pub(super) fn create(
-    fields: &Punctuated<Field, Comma>,
+    fields: &[NamedField],
     builder_factory_ident: &Ident,
     builder_state_ident: &Ident,
 ) -> TokenStream {
     let all_unset_fields = fields.iter().map(|field| {
-        let field_name = &field.ident.clone().unwrap();
-        let field_ident = format_ident!("{}", field_name);
-        let phantom_field_ident = format_ident!("phantom_{}", field_name);
+        let field_ident = &field.name;
+        let phantom_field_ident = format_ident!("phantom_{}", field_ident.to_string());
 
         quote! {
             #field_ident: None,
