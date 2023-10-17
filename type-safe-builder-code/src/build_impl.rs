@@ -78,6 +78,5 @@ fn default_to_set(field: &Field) -> Option<TokenStream> {
         .attrs
         .iter()
         .find(|attr| attr.path().is_ident("build_default"))
-        .map(|attr| attr.parse_args::<TokenStream>().ok())
-        .flatten()
+        .and_then(|attr| attr.parse_args::<TokenStream>().ok())
 }

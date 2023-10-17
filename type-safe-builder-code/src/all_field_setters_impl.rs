@@ -14,7 +14,7 @@ pub(super) fn create(
         let field_ident = format_ident!("{}", field_name);
 
         let other_phantom_field_type_ident = fields.iter().filter_map(|field| {
-            if field.ident.clone().unwrap().to_string() == field_name.to_string() {
+            if field_name == &field.ident.clone().unwrap() {
                 None
             } else {
                 let phantom_field_type_ident = phantom_field_type_ident(&field.ident.clone().unwrap());
@@ -23,7 +23,7 @@ pub(super) fn create(
         });
 
         let input_phantom_field_type_ident = fields.iter().map(|field| {
-            if field.ident.clone().unwrap().to_string() == field_name.to_string() {
+            if field_name == &field.ident.clone().unwrap() {
                 quote!{type_safe_builder_code::Unset}
             } else {
                 let phantom_field_type_ident = phantom_field_type_ident(&field.ident.clone().unwrap());
@@ -32,7 +32,7 @@ pub(super) fn create(
         });
 
         let output_phantom_field_type_ident = fields.iter().map(|field| {
-            if field.ident.clone().unwrap().to_string() == field_name.to_string() {
+            if field_name == &field.ident.clone().unwrap() {
                 quote!{#field_type}
             } else {
                 let phantom_field_type_ident = phantom_field_type_ident(&field.ident.clone().unwrap());
@@ -41,7 +41,7 @@ pub(super) fn create(
         });
 
         let copy_other_fields = fields.iter().filter_map(|field| {
-            if field.ident.clone().unwrap().to_string() == field_name.to_string() {
+            if field_name == &field.ident.clone().unwrap() {
                 None
             } else {
                 let field_name = &field.ident.clone().unwrap();

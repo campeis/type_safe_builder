@@ -12,6 +12,6 @@ fn test() {
     };
 
     let actual = builder_for(input);
-    println!("{}", actual.to_string());
+
     assert!(actual.to_string().contains("struct Struct1Builder"));
 }
