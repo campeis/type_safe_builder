@@ -10,7 +10,12 @@ pub(crate) fn create(
     name: &Ident,
 ) -> TokenStream {
     let all_not_default_set = fields.iter().map(|field| {
-        let phantom_field_type_ident = phantom_field_type_ident(&field.ident.clone().unwrap());
+        let phantom_field_type_ident = phantom_field_type_ident(
+            &field
+                .ident
+                .clone()
+                .expect("unnamed fields are not supported"),
+        );
         let field_type = &field.ty;
         if is_with_default(field) {
             quote! {
@@ -24,7 +29,12 @@ pub(crate) fn create(
     });
 
     let all_default_phantom_fields_types = fields.iter().filter_map(|field| {
-        let phantom_field_type_ident = phantom_field_type_ident(&field.ident.clone().unwrap());
+        let phantom_field_type_ident = phantom_field_type_ident(
+            &field
+                .ident
+                .clone()
+                .expect("unnamed fields are not supported"),
+        );
         if is_with_default(field) {
             Some(quote! {#phantom_field_type_ident})
         } else {
@@ -33,7 +43,10 @@ pub(crate) fn create(
     });
 
     let copy_all_fields = fields.iter().map(|field| {
-        let field_name = field.ident.clone().unwrap();
+        let field_name = field
+            .ident
+            .clone()
+            .expect("unnamed fields are not supported");
         if is_with_default(field) {
             default_to_set(field)
                 .map(|t| {

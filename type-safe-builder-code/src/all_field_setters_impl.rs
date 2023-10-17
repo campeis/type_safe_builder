@@ -9,48 +9,48 @@ pub(super) fn create(
     builder_state_ident: &Ident,
 ) -> Vec<TokenStream> {
     fields.iter().map(|field| {
-        let field_name = &field.ident.clone().unwrap();
+        let field_name = &field.ident.clone().expect("unnamed fields are not supported");
         let field_type = &field.ty;
         let field_ident = format_ident!("{}", field_name);
 
         let other_phantom_field_type_ident = fields.iter().filter_map(|field| {
-            if field_name == &field.ident.clone().unwrap() {
+            if field_name == &field.ident.clone().expect("unnamed fields are not supported") {
                 None
             } else {
-                let phantom_field_type_ident = phantom_field_type_ident(&field.ident.clone().unwrap());
+                let phantom_field_type_ident = phantom_field_type_ident(&field.ident.clone().expect("unnamed fields are not supported"));
                 Some(quote!{#phantom_field_type_ident})
             }
         });
 
         let input_phantom_field_type_ident = fields.iter().map(|field| {
-            if field_name == &field.ident.clone().unwrap() {
+            if field_name == &field.ident.clone().expect("unnamed fields are not supported") {
                 quote!{type_safe_builder_code::Unset}
             } else {
-                let phantom_field_type_ident = phantom_field_type_ident(&field.ident.clone().unwrap());
+                let phantom_field_type_ident = phantom_field_type_ident(&field.ident.clone().expect("unnamed fields are not supported"));
                 quote!{#phantom_field_type_ident}
             }
         });
 
         let output_phantom_field_type_ident = fields.iter().map(|field| {
-            if field_name == &field.ident.clone().unwrap() {
+            if field_name == &field.ident.clone().expect("unnamed fields are not supported") {
                 quote!{#field_type}
             } else {
-                let phantom_field_type_ident = phantom_field_type_ident(&field.ident.clone().unwrap());
+                let phantom_field_type_ident = phantom_field_type_ident(&field.ident.clone().expect("unnamed fields are not supported"));
                 quote!{#phantom_field_type_ident}
             }
         });
 
         let copy_other_fields = fields.iter().filter_map(|field| {
-            if field_name == &field.ident.clone().unwrap() {
+            let other_field = &field.ident.clone().expect("unnamed fields are not supported");
+            if field_name == other_field{
                 None
             } else {
-                let field_name = &field.ident.clone().unwrap();
-                Some(quote!{#field_name: self.#field_name})
+                Some(quote!{#other_field: self.#other_field})
             }
         });
 
         let all_phantom_to_default = fields.iter().map(|field| {
-            let field_name = &field.ident.clone().unwrap();
+            let field_name = &field.ident.clone().expect("unnamed fields are not supported");
             let phantom_field_ident = format_ident!("phantom_{}", field_name);
 
             quote! {

@@ -9,7 +9,10 @@ pub(super) fn create(
     builder_state_ident: &Ident,
 ) -> TokenStream {
     let state_fields_declarations = fields.iter().map(|field| {
-        let field_name = &field.ident.clone().unwrap();
+        let field_name = &field
+            .ident
+            .clone()
+            .expect("unnamed fields are not supported");
         let field_type = &field.ty;
         let field_ident = format_ident!("{}", field_name);
         let phantom_field_ident = format_ident!("phantom_{}", field_name);
@@ -21,7 +24,10 @@ pub(super) fn create(
     });
 
     let all_phantom_fields_types = fields.iter().map(|field| {
-        let field_name = &field.ident.clone().unwrap();
+        let field_name = &field
+            .ident
+            .clone()
+            .expect("unnamed fields are not supported");
         let phantom_field_type_ident = phantom_field_type_ident(field_name);
         quote! {
             #phantom_field_type_ident
