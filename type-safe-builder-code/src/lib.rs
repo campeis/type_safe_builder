@@ -71,6 +71,52 @@ pub fn builder_for(item: TokenStream) -> TokenStream {
         }
     });
 
+    let copy_all_fields = fields.iter().map(|field| {
+        let field_name = field.ident.clone().unwrap();
+        if is_with_default(field) {
+            default_to_set(field)
+                .map(|t| {
+                    quote! {
+                        #field_name: #t
+                    }
+                })
+                .unwrap_or(quote! {
+                    #field_name: self.#field_name.unwrap_or_default()
+                })
+        } else {
+            quote! {
+                #field_name: self.#field_name.unwrap()
+            }
+        }
+    });
+
+    let all_default_phantom_fields_types = fields.iter().filter_map(|field| {
+        let phantom_field_type_ident = phantom_field_type_ident(&field.ident.clone().unwrap());
+        if is_with_default(field) {
+            Some(quote! {#phantom_field_type_ident})
+        } else {
+            None
+        }
+    });
+
+    let builder_struct = builder_struct(&builder_factory_ident);
+
+    let builder_factory_impl = quote! {
+        impl #builder_factory_ident {
+            pub fn builder() -> #builder_state_ident<#(#all_unset,)*> {
+                #builder_state_ident {
+                    #(#all_unset_fields,)*
+                }
+            }
+        }
+    };
+
+    let builder_state_struct = quote! {
+        struct #builder_state_ident<#(#all_phantom_fields_types,)*> {
+            #(#state_fields_declarations,)*
+        }
+    };
+
     let all_field_setter_impl = fields.iter().map(|field| {
         let field_name = &field.ident.clone().unwrap();
         let field_type = &field.ty;
@@ -135,50 +181,7 @@ pub fn builder_for(item: TokenStream) -> TokenStream {
         }
     });
 
-    let copy_all_fields = fields.iter().map(|field| {
-        let field_name = field.ident.clone().unwrap();
-        if is_with_default(field) {
-            default_to_set(field)
-                .map(|t| {
-                    quote! {
-                        #field_name: #t
-                    }
-                })
-                .unwrap_or(quote! {
-                    #field_name: self.#field_name.unwrap_or_default()
-                })
-        } else {
-            quote! {
-                #field_name: self.#field_name.unwrap()
-            }
-        }
-    });
-
-    let all_default_phantom_fields_types = fields.iter().filter_map(|field| {
-        let phantom_field_type_ident = phantom_field_type_ident(&field.ident.clone().unwrap());
-        if is_with_default(field) {
-            Some(quote! {#phantom_field_type_ident})
-        } else {
-            None
-        }
-    });
-
-    quote! {
-        struct #builder_factory_ident {
-        }
-        impl #builder_factory_ident {
-            pub fn builder() -> #builder_state_ident<#(#all_unset,)*> {
-                #builder_state_ident {
-                    #(#all_unset_fields,)*
-                }
-            }
-        }
-        struct #builder_state_ident<#(#all_phantom_fields_types,)*> {
-            #(#state_fields_declarations,)*
-        }
-
-        #(#all_field_setter_impl )*
-
+    let build_impl = quote! {
         impl <#(#all_default_phantom_fields_types,)*> #builder_state_ident<#(#all_not_default_set,)*> {
             fn build(self) -> #name {
                 #name {
@@ -186,6 +189,22 @@ pub fn builder_for(item: TokenStream) -> TokenStream {
                 }
             }
         }
+    };
+
+    quote! {
+        #builder_struct
+        #builder_factory_impl
+        #builder_state_struct
+
+        #(#all_field_setter_impl )*
+
+        #build_impl
+    }
+}
+
+fn builder_struct(builder_factory_ident: &Ident) -> TokenStream {
+    quote! {
+        struct #builder_factory_ident {}
     }
 }
 
