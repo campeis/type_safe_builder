@@ -98,3 +98,15 @@ fn default_fields_can_be_overridden() {
     assert_eq!("value f1", built.f1);
     assert_eq!(1, built.f2);
 }
+
+#[test]
+fn accepts_fields_with_generic_args() {
+    #[derive(Builder)]
+    struct StructWithField {
+        f1: Option<i64>,
+    }
+
+    let built = StructWithFieldBuilder::builder().f1(Some(1)).build();
+
+    assert_eq!(Some(1), built.f1);
+}
