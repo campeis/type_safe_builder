@@ -68,8 +68,14 @@ pub(super) fn create(
         let all_generics2 = all_generics.clone();
         let all_generics3 = all_generics.clone();
 
+        let where_clause = generics.where_clause.clone().map(|clause| {
+            quote! {
+            #clause
+        }
+        });
+
         quote! {
-            impl<#(#all_generics,)*#(#other_phantom_field_type_ident,)*> #builder_state_ident<#(#all_generics2,)*#(#input_phantom_field_type_ident,)*> {
+            impl<#(#all_generics,)*#(#other_phantom_field_type_ident,)*> #builder_state_ident<#(#all_generics2,)*#(#input_phantom_field_type_ident,)*> #where_clause {
             fn #field_ident(self, value: #field_type) -> #builder_state_ident<#(#all_generics3,)*#(#output_phantom_field_type_ident,)*> {
                 #builder_state_ident {
                     #field_ident: Some(value),

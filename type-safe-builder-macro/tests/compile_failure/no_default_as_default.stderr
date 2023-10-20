@@ -1,9 +1,3 @@
-error[E0601]: `main` function not found in crate `$CRATE`
-  --> tests/compile_failure/no_default_as_default.rs:10:2
-   |
-10 | }
-   |  ^ consider adding a `main` function to `$DIR/tests/compile_failure/no_default_as_default.rs`
-
 error[E0277]: the trait bound `WithNoDefault: Default` is not satisfied
  --> tests/compile_failure/no_default_as_default.rs:6:10
   |

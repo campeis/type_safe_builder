@@ -8,3 +8,5 @@ struct StructWithFieldWithNoDefault {
     #[build_default]
     field: WithNoDefault,
 }
+
+fn main() {}

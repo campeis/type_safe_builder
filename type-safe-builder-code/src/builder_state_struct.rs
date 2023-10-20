@@ -34,8 +34,14 @@ pub(super) fn create(
         }
     });
 
+    let where_clause = generics.where_clause.clone().map(|clause| {
+        quote! {
+            #clause
+        }
+    });
+
     quote! {
-        struct #builder_state_ident<#(#all_generics,)*#(#all_phantom_fields_types,)*> {
+        struct #builder_state_ident<#(#all_generics,)*#(#all_phantom_fields_types,)*> #where_clause {
             #(#state_fields_declarations,)*
         }
     }

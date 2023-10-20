@@ -59,8 +59,14 @@ pub(crate) fn create(
     let all_generics2 = all_generics.clone();
     let all_generics3 = all_generics.clone();
 
+    let where_clause = generics.where_clause.clone().map(|clause| {
+        quote! {
+            #clause
+        }
+    });
+
     quote! {
-        impl <#(#all_generics,)*#(#all_default_phantom_fields_types,)*> #builder_state_ident<#(#all_generics2,)*#(#all_not_default_set,)*> {
+        impl <#(#all_generics,)*#(#all_default_phantom_fields_types,)*> #builder_state_ident<#(#all_generics2,)*#(#all_not_default_set,)*> #where_clause{
             fn build(self) -> #name<#(#all_generics3,)*> {
                 #name {
                     #(#copy_all_fields,)*

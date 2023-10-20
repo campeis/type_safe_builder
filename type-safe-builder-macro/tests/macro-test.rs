@@ -122,3 +122,57 @@ fn works_with_fields_of_generic_type() {
 
     assert_eq!(1, built.f1);
 }
+
+#[test]
+fn generic_fields_could_have_where() {
+    trait TraitForField {}
+    struct FieldStruct {
+        content: i64,
+    }
+    impl TraitForField for FieldStruct {}
+
+    #[derive(Builder)]
+    struct GenericStruct<T>
+    where
+        T: TraitForField,
+    {
+        f1: T,
+    }
+    let built = GenericStructBuilder::builder()
+        .f1(FieldStruct { content: 1 })
+        .build();
+
+    assert_eq!(1, built.f1.content)
+}
+
+#[test]
+fn more_then_one_field_could_have_generics_and_where_clause() {
+    trait TraitForField {}
+    struct FieldStruct {
+        content: i64,
+    }
+    impl TraitForField for FieldStruct {}
+
+    trait OtherTraitForField {}
+    struct OtherFieldStruct {
+        content: i64,
+    }
+    impl OtherTraitForField for OtherFieldStruct {}
+
+    #[derive(Builder)]
+    struct GenericStruct<T, K>
+    where
+        T: TraitForField,
+        K: OtherTraitForField,
+    {
+        f1: T,
+        f2: K,
+    }
+    let built = GenericStructBuilder::builder()
+        .f1(FieldStruct { content: 1 })
+        .f2(OtherFieldStruct { content: 2 })
+        .build();
+
+    assert_eq!(1, built.f1.content);
+    assert_eq!(2, built.f2.content);
+}
