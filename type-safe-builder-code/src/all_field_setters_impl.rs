@@ -1,8 +1,13 @@
 use crate::NamedField;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
+use syn::Generics;
 
-pub(super) fn create(fields: &[NamedField], builder_state_ident: &Ident) -> Vec<TokenStream> {
+pub(super) fn create(
+    fields: &[NamedField],
+    builder_state_ident: &Ident,
+    generics: &Generics,
+) -> Vec<TokenStream> {
     fields.iter().map(|field| {
         let field_name = &field.name;
         let field_type = &field.ty;
@@ -28,7 +33,7 @@ pub(super) fn create(fields: &[NamedField], builder_state_ident: &Ident) -> Vec<
 
         let output_phantom_field_type_ident = fields.iter().map(|field| {
             if field_name == &field.name{
-                quote!{#field_type}
+                quote!{type_safe_builder_code::Set}
             } else {
                 let phantom_field_type_ident = phantom_field_type_ident(&field.name);
                 quote!{#phantom_field_type_ident}
@@ -53,9 +58,19 @@ pub(super) fn create(fields: &[NamedField], builder_state_ident: &Ident) -> Vec<
         }
         });
 
+        let generic_params = generics.params.clone();
+        let all_generics = generic_params.iter().map(|param| {
+            quote! {
+            #param
+        }
+        });
+
+        let all_generics2 = all_generics.clone();
+        let all_generics3 = all_generics.clone();
+
         quote! {
-            impl<#(#other_phantom_field_type_ident,)*> #builder_state_ident<#(#input_phantom_field_type_ident,)*> {
-            fn #field_ident(self, value: #field_type) -> #builder_state_ident<#(#output_phantom_field_type_ident,)*> {
+            impl<#(#all_generics,)*#(#other_phantom_field_type_ident,)*> #builder_state_ident<#(#all_generics2,)*#(#input_phantom_field_type_ident,)*> {
+            fn #field_ident(self, value: #field_type) -> #builder_state_ident<#(#all_generics3,)*#(#output_phantom_field_type_ident,)*> {
                 #builder_state_ident {
                     #field_ident: Some(value),
                     #(#copy_other_fields,)*

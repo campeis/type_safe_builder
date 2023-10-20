@@ -1,11 +1,13 @@
 use crate::NamedField;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
+use syn::Generics;
 
 pub(super) fn create(
     fields: &[NamedField],
     builder_factory_ident: &Ident,
     builder_state_ident: &Ident,
+    generics: &Generics,
 ) -> TokenStream {
     let all_unset_fields = fields.iter().map(|field| {
         let field_ident = &field.name;
@@ -23,9 +25,19 @@ pub(super) fn create(
         }
     });
 
+    let generic_params = generics.params.clone();
+    let all_generics = generic_params.iter().map(|param| {
+        quote! {
+            #param
+        }
+    });
+
+    let all_generics2 = all_generics.clone();
+    let all_generics3 = all_generics.clone();
+
     quote! {
-        impl #builder_factory_ident {
-            pub fn builder() -> #builder_state_ident<#(#all_unset,)*> {
+        impl <#(#all_generics,)*> #builder_factory_ident<#(#all_generics2,)*> {
+            pub fn builder() -> #builder_state_ident<#(#all_generics3,)*#(#all_unset,)*> {
                 #builder_state_ident {
                     #(#all_unset_fields,)*
                 }

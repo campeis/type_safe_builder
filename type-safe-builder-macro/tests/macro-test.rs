@@ -110,3 +110,15 @@ fn accepts_fields_with_generic_args() {
 
     assert_eq!(Some(1), built.f1);
 }
+
+#[test]
+fn works_with_fields_of_generic_type() {
+    #[derive(Builder)]
+    struct GenericStruct<T> {
+        f1: T,
+    }
+
+    let built = GenericStructBuilder::builder().f1(1).build();
+
+    assert_eq!(1, built.f1);
+}

@@ -1,23 +1,23 @@
 use crate::NamedField;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
-use syn::Attribute;
+use syn::{Attribute, Generics};
 
 pub(crate) fn create(
     fields: &[NamedField],
     builder_state_ident: &Ident,
+    generics: &Generics,
     name: &Ident,
 ) -> TokenStream {
     let all_not_default_set = fields.iter().map(|field| {
         let phantom_field_type_ident = phantom_field_type_ident(&field.name);
-        let field_type = &field.ty;
         if is_with_default(&field.attrs) {
             quote! {
                 #phantom_field_type_ident
             }
         } else {
             quote! {
-                #field_type
+                type_safe_builder_code::Set
             }
         }
     });
@@ -50,9 +50,18 @@ pub(crate) fn create(
         }
     });
 
+    let generic_params = generics.params.clone();
+    let all_generics = generic_params.iter().map(|param| {
+        quote! {
+            #param
+        }
+    });
+    let all_generics2 = all_generics.clone();
+    let all_generics3 = all_generics.clone();
+
     quote! {
-        impl <#(#all_default_phantom_fields_types,)*> #builder_state_ident<#(#all_not_default_set,)*> {
-            fn build(self) -> #name {
+        impl <#(#all_generics,)*#(#all_default_phantom_fields_types,)*> #builder_state_ident<#(#all_generics2,)*#(#all_not_default_set,)*> {
+            fn build(self) -> #name<#(#all_generics3,)*> {
                 #name {
                     #(#copy_all_fields,)*
                 }
