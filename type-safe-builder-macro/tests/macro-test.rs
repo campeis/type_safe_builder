@@ -176,3 +176,22 @@ fn more_then_one_field_could_have_generics_and_where_clause() {
     assert_eq!(1, built.f1.content);
     assert_eq!(2, built.f2.content);
 }
+
+#[test]
+fn generic_fields_can_have_defaults() {
+    #[derive(Default, Eq, PartialEq, Debug)]
+    struct StructWithDefault {
+        v: i64,
+    }
+    #[derive(Builder)]
+    struct GenericStruct<T>
+    where
+        T: Default,
+    {
+        #[build_default]
+        f1: T,
+    }
+    let built: GenericStruct<StructWithDefault> = GenericStructBuilder::builder().build();
+
+    assert_eq!(StructWithDefault::default(), built.f1);
+}
