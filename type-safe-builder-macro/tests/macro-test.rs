@@ -193,8 +193,7 @@ fn generic_fields_can_have_defaults() {
         #[build_default]
         f2: K,
     }
-    let built: GenericStruct<StructWithDefault, StructWithDefault> =
-        GenericStructBuilder::builder().build();
+    let built = GenericStructBuilder::builder().build();
 
     assert_eq!(StructWithDefault::default(), built.f1);
     assert_eq!(StructWithDefault::default(), built.f2);
