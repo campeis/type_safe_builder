@@ -1,7 +1,7 @@
 use crate::NamedField;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
-use syn::Generics;
+use syn::{GenericParam, Generics};
 
 pub(super) fn create(
     fields: &[NamedField],
@@ -32,8 +32,22 @@ pub(super) fn create(
         }
     });
 
-    let all_generics2 = all_generics.clone();
-    let all_generics3 = all_generics.clone();
+    let all_generics2 = generic_params.iter().map(|gen| match gen {
+        GenericParam::Lifetime(l) => {
+            let l = &l.lifetime;
+            quote! {#l}
+        }
+        GenericParam::Type(t) => {
+            let i = &t.ident;
+            quote! {#i}
+        }
+        GenericParam::Const(c) => {
+            let i = &c.ident;
+            quote! {#i}
+        }
+    });
+
+    let all_generics3 = all_generics2.clone();
 
     let where_clause = generics.where_clause.clone().map(|clause| {
         quote! {

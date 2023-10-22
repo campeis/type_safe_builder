@@ -184,14 +184,18 @@ fn generic_fields_can_have_defaults() {
         v: i64,
     }
     #[derive(Builder)]
-    struct GenericStruct<T>
+    struct GenericStruct<T, K: Default>
     where
         T: Default,
     {
         #[build_default]
         f1: T,
+        #[build_default]
+        f2: K,
     }
-    let built: GenericStruct<StructWithDefault> = GenericStructBuilder::builder().build();
+    let built: GenericStruct<StructWithDefault, StructWithDefault> =
+        GenericStructBuilder::builder().build();
 
     assert_eq!(StructWithDefault::default(), built.f1);
+    assert_eq!(StructWithDefault::default(), built.f2);
 }
