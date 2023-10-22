@@ -13,9 +13,6 @@ mod builder_factory_impl;
 mod builder_state_struct;
 mod builder_struct;
 
-pub struct Set {}
-pub struct Unset {}
-
 struct NamedField {
     name: Ident,
     ty: Type,

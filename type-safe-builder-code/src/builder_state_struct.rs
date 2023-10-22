@@ -11,11 +11,8 @@ pub(super) fn create(
     let state_fields_declarations = fields.iter().map(|field| {
         let field_ident = &field.name;
         let field_type = &field.ty;
-        let phantom_field_ident = format_ident!("phantom_{}", field_ident);
-        let phantom_field_type_ident = phantom_field_type_ident(field_ident);
         quote! {
-            #field_ident: Option<#field_type>,
-            #phantom_field_ident: core::marker::PhantomData<#phantom_field_type_ident>
+            #field_ident: Option<#field_type>
         }
     });
 
@@ -23,7 +20,7 @@ pub(super) fn create(
         let field_name = &field.name;
         let phantom_field_type_ident = phantom_field_type_ident(field_name);
         quote! {
-            #phantom_field_type_ident
+            const #phantom_field_type_ident : bool
         }
     });
 
@@ -48,5 +45,5 @@ pub(super) fn create(
 }
 
 fn phantom_field_type_ident(field_name: &Ident) -> Ident {
-    format_ident!("Phantom{}Type", field_name)
+    format_ident!("PHANTOM{}TYPE", field_name.to_string().to_uppercase())
 }

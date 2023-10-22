@@ -17,7 +17,7 @@ pub(crate) fn create(
             }
         } else {
             quote! {
-                type_safe_builder_code::Set
+                true
             }
         }
     });
@@ -25,7 +25,7 @@ pub(crate) fn create(
     let all_default_phantom_fields_types = fields.iter().filter_map(|field| {
         let phantom_field_type_ident = phantom_field_type_ident(&field.name);
         if is_with_default(&field.attrs) {
-            Some(quote! {#phantom_field_type_ident})
+            Some(quote! {const #phantom_field_type_ident : bool})
         } else {
             None
         }
@@ -90,7 +90,7 @@ pub(crate) fn create(
 }
 
 fn phantom_field_type_ident(field_name: &Ident) -> Ident {
-    format_ident!("Phantom{}Type", field_name)
+    format_ident!("PHANTOM{}TYPE", field_name.to_string().to_uppercase())
 }
 
 fn is_with_default(attrs: &[Attribute]) -> bool {

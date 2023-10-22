@@ -18,13 +18,13 @@ pub(super) fn create(
                 None
             } else {
                 let phantom_field_type_ident = phantom_field_type_ident(&field.name);
-                Some(quote!{#phantom_field_type_ident})
+                Some(quote!{const #phantom_field_type_ident: bool})
             }
         });
 
         let input_phantom_field_type_ident = fields.iter().map(|field| {
             if field_name == &field.name {
-                quote!{type_safe_builder_code::Unset}
+                quote!{false}
             } else {
                 let phantom_field_type_ident = phantom_field_type_ident(&field.name);
                 quote!{#phantom_field_type_ident}
@@ -33,7 +33,7 @@ pub(super) fn create(
 
         let output_phantom_field_type_ident = fields.iter().map(|field| {
             if field_name == &field.name{
-                quote!{type_safe_builder_code::Set}
+                quote!{true}
             } else {
                 let phantom_field_type_ident = phantom_field_type_ident(&field.name);
                 quote!{#phantom_field_type_ident}
@@ -47,15 +47,6 @@ pub(super) fn create(
             } else {
                 Some(quote!{#other_field: self.#other_field})
             }
-        });
-
-        let all_phantom_to_default = fields.iter().map(|field| {
-            let field_name = &field.name;
-            let phantom_field_ident = format_ident!("phantom_{}", field_name);
-
-            quote! {
-            #phantom_field_ident: Default::default()
-        }
         });
 
         let generic_params = generics.params.clone();
@@ -93,7 +84,6 @@ pub(super) fn create(
                 #builder_state_ident {
                     #field_ident: Some(value),
                     #(#copy_other_fields,)*
-                    #(#all_phantom_to_default,)*
                     }
                 }
             }
@@ -102,5 +92,5 @@ pub(super) fn create(
 }
 
 fn phantom_field_type_ident(field_name: &Ident) -> Ident {
-    format_ident!("Phantom{}Type", field_name)
+    format_ident!("PHANTOM{}TYPE", field_name.to_string().to_uppercase())
 }

@@ -5,11 +5,11 @@ error[E0277]: the trait bound `StructWithoutRequiredTrait: TraitForField` is not
    |                                                    ^^ the trait `TraitForField` is not implemented for `StructWithoutRequiredTrait`
    |
    = help: the trait `TraitForField` is implemented for `FieldStruct`
-note: required by a bound in `GenericStructBuilderState::<T, Unset>::f1`
+note: required by a bound in `GenericStructBuilderState::<T, false>::f1`
   --> tests/compile_failure/not_respecting_where_clause.rs:10:8
    |
 10 |     T: TraitForField,
-   |        ^^^^^^^^^^^^^ required by this bound in `GenericStructBuilderState::<T, Unset>::f1`
+   |        ^^^^^^^^^^^^^ required by this bound in `GenericStructBuilderState::<T, false>::f1`
 11 | {
 12 |     f1: T,
    |     -- required by a bound in this associated function
