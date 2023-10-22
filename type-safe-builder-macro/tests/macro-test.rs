@@ -238,3 +238,13 @@ fn can_build_structs_with_generics_timelines_and_constraints() {
 
     assert_eq!(1, built.f1.get_content());
 }
+
+#[test]
+fn works_with_const_generics() {
+    #[derive(Builder)]
+    struct ConstGenericStruct<const T: bool> {}
+
+    let builder: ConstGenericStructBuilderState<true> = ConstGenericStructBuilder::builder();
+
+    let _built = builder.build();
+}
