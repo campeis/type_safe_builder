@@ -198,3 +198,43 @@ fn generic_fields_can_have_defaults() {
     assert_eq!(StructWithDefault::default(), built.f1);
     assert_eq!(StructWithDefault::default(), built.f2);
 }
+
+#[test]
+fn can_build_structs_with_timelines() {
+    #[derive(Builder)]
+    struct TimelineStruct<'a> {
+        f1: &'a String,
+    }
+
+    let string = "a string".to_string();
+    let built = TimelineStructBuilder::builder().f1(&string).build();
+
+    assert_eq!("a string".to_string(), built.f1.to_owned())
+}
+
+#[test]
+fn can_build_structs_with_generics_timelines_and_constraints() {
+    trait TraitForField {
+        fn get_content(&self) -> i64;
+    }
+    struct FieldStruct {
+        content: i64,
+    }
+    impl TraitForField for FieldStruct {
+        fn get_content(&self) -> i64 {
+            self.content
+        }
+    }
+
+    #[derive(Builder)]
+    struct TimelineStruct<'a, T: TraitForField> {
+        f1: &'a T,
+    }
+
+    let referenced_struct = FieldStruct { content: 1 };
+    let built = TimelineStructBuilder::builder()
+        .f1(&referenced_struct)
+        .build();
+
+    assert_eq!(1, built.f1.get_content());
+}

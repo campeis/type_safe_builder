@@ -49,7 +49,7 @@ pub fn builder_for(item: TokenStream) -> TokenStream {
         })
         .collect::<Vec<_>>();
 
-    let builder_struct = builder_struct::create(&builder_factory_ident, &generics);
+    let builder_struct = builder_struct::create(&builder_factory_ident);
     let builder_factory_impl = builder_factory_impl::create(
         &fields,
         &builder_factory_ident,

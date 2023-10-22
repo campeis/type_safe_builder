@@ -47,8 +47,6 @@ pub(super) fn create(
         }
     });
 
-    let all_generics3 = all_generics2.clone();
-
     let where_clause = generics.where_clause.clone().map(|clause| {
         quote! {
             #clause
@@ -56,8 +54,8 @@ pub(super) fn create(
     });
 
     quote! {
-        impl <#(#all_generics,)*> #builder_factory_ident<#(#all_generics2,)*> #where_clause {
-            pub fn builder() -> #builder_state_ident<#(#all_generics3,)*#(#all_unset,)*> {
+        impl #builder_factory_ident {
+            pub fn builder<#(#all_generics,)*>() -> #builder_state_ident<#(#all_generics2,)*#(#all_unset,)*> #where_clause {
                 #builder_state_ident {
                     #(#all_unset_fields,)*
                 }
