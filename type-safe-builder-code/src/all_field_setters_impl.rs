@@ -1,96 +1,94 @@
-use crate::NamedField;
-use proc_macro2::{Ident, TokenStream};
-use quote::{format_ident, quote};
-use syn::{GenericParam, Generics};
+use crate::parse::{Field, FromStruct};
+use proc_macro2::TokenStream;
+use quote::quote;
+use syn::GenericParam;
 
-pub(super) fn create(
-    fields: &[NamedField],
-    builder_state_ident: &Ident,
-    generics: &Generics,
-) -> Vec<TokenStream> {
-    fields.iter().map(|field| {
-        let field_name = &field.name;
-        let field_type = &field.ty;
-        let field_ident = format_ident!("{}", field_name);
+pub(super) fn create(from_struct: &FromStruct) -> Vec<TokenStream> {
+    from_struct
+        .fields
+        .iter()
+        .map(|field| setter_impl_for(field, from_struct))
+        .collect()
+}
 
-        let other_phantom_field_type_ident = fields.iter().filter_map(|field| {
-            if field_name == &field.name {
-                None
-            } else {
-                let phantom_field_type_ident = phantom_field_type_ident(&field.name);
-                Some(quote!{const #phantom_field_type_ident: bool})
-            }
-        });
+fn setter_impl_for(field: &Field, from_struct: &FromStruct) -> TokenStream {
+    let field_ident = field.ident();
+    let field_type = field.ty();
 
-        let input_phantom_field_type_ident = fields.iter().map(|field| {
-            if field_name == &field.name {
-                quote!{false}
-            } else {
-                let phantom_field_type_ident = phantom_field_type_ident(&field.name);
-                quote!{#phantom_field_type_ident}
-            }
-        });
+    let other_placeholder_field_type_ident = from_struct.fields.iter().filter_map(|other_field| {
+        if other_field.ident() == field.ident() {
+            None
+        } else {
+            let field_placeholder = other_field.field_placeholder();
+            Some(quote! {const #field_placeholder: bool})
+        }
+    });
 
-        let output_phantom_field_type_ident = fields.iter().map(|field| {
-            if field_name == &field.name{
-                quote!{true}
-            } else {
-                let phantom_field_type_ident = phantom_field_type_ident(&field.name);
-                quote!{#phantom_field_type_ident}
-            }
-        });
+    let input_placeholder_field_type_ident = from_struct.fields.iter().map(|other_field| {
+        if other_field.ident() == field.ident() {
+            quote! {false}
+        } else {
+            let field_placeholder = other_field.field_placeholder();
+            quote! {#field_placeholder}
+        }
+    });
 
-        let copy_other_fields = fields.iter().filter_map(|field| {
-            let other_field = &field.name;
-            if field_name == other_field{
-                None
-            } else {
-                Some(quote!{#other_field: self.#other_field})
-            }
-        });
+    let output_placeholder_field_type_ident = from_struct.fields.iter().map(|other_field| {
+        if other_field.ident() == field.ident() {
+            quote! {true}
+        } else {
+            let field_placeholder = other_field.field_placeholder();
+            quote! {#field_placeholder}
+        }
+    });
 
-        let generic_params = generics.params.clone();
-        let all_generics = generic_params.iter().map(|param| {
-            quote! {
+    let copy_other_fields = from_struct.fields.iter().filter_map(|other_field| {
+        if other_field.ident() == field.ident() {
+            None
+        } else {
+            let other_field_ident = other_field.ident();
+            Some(quote! {#other_field_ident: self.#other_field_ident})
+        }
+    });
+
+    let generic_params = from_struct.generics.params.clone();
+    let all_generics = generic_params.iter().map(|param| {
+        quote! {
             #param
         }
-        });
+    });
 
-        let all_generics2 = generic_params.iter().map(|gen| match gen {
-            GenericParam::Lifetime(l) => {
-                let l = &l.lifetime;
-                quote! {#l}
-            }
-            GenericParam::Type(t) => {
-                let i = &t.ident;
-                quote! {#i}
-            }
-            GenericParam::Const(c) => {
-                let i = &c.ident;
-                quote! {#i}
-            }
-        });
-        let all_generics3 = all_generics2.clone();
+    let all_generics2 = generic_params.iter().map(|gen| match gen {
+        GenericParam::Lifetime(l) => {
+            let l = &l.lifetime;
+            quote! {#l}
+        }
+        GenericParam::Type(t) => {
+            let i = &t.ident;
+            quote! {#i}
+        }
+        GenericParam::Const(c) => {
+            let i = &c.ident;
+            quote! {#i}
+        }
+    });
+    let all_generics3 = all_generics2.clone();
 
-        let where_clause = generics.where_clause.clone().map(|clause| {
-            quote! {
+    let where_clause = from_struct.generics.where_clause.clone().map(|clause| {
+        quote! {
             #clause
         }
-        });
+    });
 
-        quote! {
-            impl<#(#all_generics,)*#(#other_phantom_field_type_ident,)*> #builder_state_ident<#(#all_generics2,)*#(#input_phantom_field_type_ident,)*> #where_clause {
-            fn #field_ident(self, value: #field_type) -> #builder_state_ident<#(#all_generics3,)*#(#output_phantom_field_type_ident,)*> {
-                #builder_state_ident {
-                    #field_ident: Some(value),
-                    #(#copy_other_fields,)*
-                    }
+    let builder_state_ident = from_struct.builder_state_ident();
+    quote! {
+        impl<#(#all_generics,)*#(#other_placeholder_field_type_ident,)*> #builder_state_ident<#(#all_generics2,)*#(#input_placeholder_field_type_ident,)*> #where_clause {
+        fn #field_ident(self, value: #field_type) -> #builder_state_ident<#(#all_generics3,)*#(#output_placeholder_field_type_ident,)*> {
+            #builder_state_ident {
+                #field_ident: Some(value),
+                #(#copy_other_fields,)*
                 }
             }
         }
-    }).collect()
-}
-
-fn phantom_field_type_ident(field_name: &Ident) -> Ident {
-    format_ident!("PHANTOM{}TYPE", field_name.to_string().to_uppercase())
+    }
 }

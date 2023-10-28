@@ -1,7 +1,9 @@
-use proc_macro2::{Ident, TokenStream};
+use crate::parse::FromStruct;
+use proc_macro2::TokenStream;
 use quote::quote;
 
-pub(super) fn create(builder_factory_ident: &Ident) -> TokenStream {
+pub(super) fn create(from_struct: &FromStruct) -> TokenStream {
+    let builder_factory_ident = from_struct.builder_ident();
     quote! {
         struct #builder_factory_ident {
         }

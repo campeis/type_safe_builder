@@ -1,29 +1,24 @@
-use crate::NamedField;
-use proc_macro2::{Ident, TokenStream};
+use crate::parse::FromStruct;
+use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{GenericParam, Generics};
+use syn::GenericParam;
 
-pub(super) fn create(
-    fields: &[NamedField],
-    builder_factory_ident: &Ident,
-    builder_state_ident: &Ident,
-    generics: &Generics,
-) -> TokenStream {
-    let all_unset_fields = fields.iter().map(|field| {
-        let field_ident = &field.name;
+pub(super) fn create(from_struct: &FromStruct) -> TokenStream {
+    let all_unset_fields = from_struct.fields.iter().map(|field| {
+        let field_ident = &field.ident();
 
         quote! {
             #field_ident: None
         }
     });
 
-    let all_unset = fields.iter().map(|_| {
+    let all_unset = from_struct.fields.iter().map(|_| {
         quote! {
             false
         }
     });
 
-    let generic_params = generics.params.clone();
+    let generic_params = from_struct.generics.params.clone();
     let all_generics = generic_params.iter().map(|param| {
         quote! {
             #param
@@ -45,11 +40,14 @@ pub(super) fn create(
         }
     });
 
-    let where_clause = generics.where_clause.clone().map(|clause| {
+    let where_clause = from_struct.generics.where_clause.clone().map(|clause| {
         quote! {
             #clause
         }
     });
+
+    let builder_factory_ident = from_struct.builder_ident();
+    let builder_state_ident = from_struct.builder_state_ident();
 
     quote! {
         impl #builder_factory_ident {
