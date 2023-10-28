@@ -5,7 +5,7 @@ struct WithNoDefault {
 }
 #[derive(Builder)]
 struct StructWithFieldWithNoDefault {
-    #[build_default]
+    #[builder(default)]
     field: WithNoDefault,
 }
 

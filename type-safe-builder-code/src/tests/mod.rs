@@ -5,7 +5,7 @@ use quote::quote;
 fn test() {
     let input = quote! {
         struct Struct1 {
-            #[build_default]
+            #[builder(default)]
             field1: i64,
             field2: String,
         }

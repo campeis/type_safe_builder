@@ -56,7 +56,7 @@ fn default_fields_do_not_need_to_be_set() {
     #[derive(Builder)]
     struct StructWithField {
         f1: String,
-        #[build_default]
+        #[builder(default)]
         f2: i64,
     }
 
@@ -72,7 +72,7 @@ fn default_fields_do_not_need_to_be_set() {
 fn default_fields_can_be_set_by_macro() {
     #[derive(Builder)]
     struct StructWithField {
-        #[build_default(10)]
+        #[builder(default = 10)]
         f1: i64,
     }
 
@@ -86,7 +86,7 @@ fn default_fields_can_be_overridden() {
     #[derive(Builder)]
     struct StructWithField {
         f1: String,
-        #[build_default]
+        #[builder(default)]
         f2: i64,
     }
 
@@ -188,9 +188,9 @@ fn generic_fields_can_have_defaults() {
     where
         T: Default,
     {
-        #[build_default]
+        #[builder(default)]
         f1: T,
-        #[build_default]
+        #[builder(default)]
         f2: K,
     }
     let built = GenericStructBuilder::builder().build();
