@@ -1,13 +1,16 @@
 use proc_macro2::{Ident, TokenStream};
-use quote::{format_ident, ToTokens};
+use quote::{format_ident, quote, ToTokens};
 use syn::punctuated::Punctuated;
 use syn::Data::Struct;
 use syn::Fields::Named;
-use syn::{parse2, Attribute, DataStruct, DeriveInput, FieldsNamed, Generics, Meta, Token, Type};
+use syn::{
+    parse2, Attribute, DataStruct, DeriveInput, FieldsNamed, GenericParam, Meta, Token, Type,
+    WhereClause,
+};
 
 pub(crate) struct FromStruct {
     pub(crate) ident: Ident,
-    pub(crate) generics: Generics,
+    pub(crate) generics: StructGenerics,
     pub(crate) fields: Vec<Field>,
 }
 
@@ -82,6 +85,52 @@ impl Field {
     }
 }
 
+pub(crate) struct StructGenerics {
+    where_clause: Option<WhereClause>,
+    generics: Vec<GenericParam>,
+}
+
+impl StructGenerics {
+    pub(crate) fn where_clause(&self) -> Option<TokenStream> {
+        self.where_clause.clone().map(|clause| {
+            quote! {
+                #clause
+            }
+        })
+    }
+
+    pub(crate) fn all(&self) -> Vec<TokenStream> {
+        self.generics
+            .iter()
+            .map(|param| {
+                quote! {
+                    #param
+                }
+            })
+            .collect()
+    }
+
+    pub(crate) fn all_names(&self) -> Vec<TokenStream> {
+        self.generics
+            .iter()
+            .map(|gen| match gen {
+                GenericParam::Lifetime(l) => {
+                    let l = &l.lifetime;
+                    quote! {#l}
+                }
+                GenericParam::Type(t) => {
+                    let i = &t.ident;
+                    quote! {#i}
+                }
+                GenericParam::Const(c) => {
+                    let i = &c.ident;
+                    quote! {#i}
+                }
+            })
+            .collect()
+    }
+}
+
 pub(super) fn parse(item: TokenStream) -> FromStruct {
     let ast: DeriveInput = parse2(item).unwrap();
 
@@ -100,7 +149,10 @@ pub(super) fn parse(item: TokenStream) -> FromStruct {
 
     FromStruct {
         ident: ast.ident,
-        generics: ast.generics,
+        generics: StructGenerics {
+            generics: ast.generics.params.into_iter().collect(),
+            where_clause: ast.generics.where_clause,
+        },
         fields,
     }
 }

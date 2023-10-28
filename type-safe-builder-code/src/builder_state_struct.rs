@@ -18,18 +18,9 @@ pub(super) fn create(from_struct: &FromStruct) -> TokenStream {
         }
     });
 
-    let generic_params = from_struct.generics.params.clone();
-    let all_generics = generic_params.iter().map(|param| {
-        quote! {
-            #param
-        }
-    });
+    let all_generics = from_struct.generics.all();
 
-    let where_clause = from_struct.generics.where_clause.clone().map(|clause| {
-        quote! {
-            #clause
-        }
-    });
+    let where_clause = from_struct.generics.where_clause();
 
     let builder_state_ident = from_struct.builder_state_ident();
 

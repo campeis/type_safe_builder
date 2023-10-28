@@ -1,7 +1,6 @@
 use crate::parse::{Field, FromStruct};
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::GenericParam;
 
 pub(super) fn create(from_struct: &FromStruct) -> Vec<TokenStream> {
     from_struct
@@ -51,39 +50,17 @@ fn setter_impl_for(field: &Field, from_struct: &FromStruct) -> TokenStream {
         }
     });
 
-    let generic_params = from_struct.generics.params.clone();
-    let all_generics = generic_params.iter().map(|param| {
-        quote! {
-            #param
-        }
-    });
+    let generics = from_struct.generics.all();
 
-    let all_generics2 = generic_params.iter().map(|gen| match gen {
-        GenericParam::Lifetime(l) => {
-            let l = &l.lifetime;
-            quote! {#l}
-        }
-        GenericParam::Type(t) => {
-            let i = &t.ident;
-            quote! {#i}
-        }
-        GenericParam::Const(c) => {
-            let i = &c.ident;
-            quote! {#i}
-        }
-    });
-    let all_generics3 = all_generics2.clone();
+    let all_generics_names1 = from_struct.generics.all_names();
+    let all_generics_names2 = all_generics_names1.clone();
 
-    let where_clause = from_struct.generics.where_clause.clone().map(|clause| {
-        quote! {
-            #clause
-        }
-    });
+    let where_clause = from_struct.generics.where_clause();
 
     let builder_state_ident = from_struct.builder_state_ident();
     quote! {
-        impl<#(#all_generics,)*#(#other_placeholder_field_type_ident,)*> #builder_state_ident<#(#all_generics2,)*#(#input_placeholder_field_type_ident,)*> #where_clause {
-        fn #field_ident(self, value: #field_type) -> #builder_state_ident<#(#all_generics3,)*#(#output_placeholder_field_type_ident,)*> {
+        impl<#(#generics,)*#(#other_placeholder_field_type_ident,)*> #builder_state_ident<#(#all_generics_names1,)*#(#input_placeholder_field_type_ident,)*> #where_clause {
+        fn #field_ident(self, value: #field_type) -> #builder_state_ident<#(#all_generics_names2,)*#(#output_placeholder_field_type_ident,)*> {
             #builder_state_ident {
                 #field_ident: Some(value),
                 #(#copy_other_fields,)*
