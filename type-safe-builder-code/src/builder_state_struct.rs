@@ -11,12 +11,10 @@ pub(super) fn create(from_struct: &FromStruct) -> TokenStream {
         }
     });
 
-    let all_placeholder_fields_types = from_struct.fields.iter().map(|field| {
-        let field_placeholder = field.field_placeholder();
-        quote! {
-            const #field_placeholder : bool
-        }
-    });
+    let all_placeholder_fields_types = from_struct
+        .fields
+        .iter()
+        .map(|field| field.const_field_placeholder());
 
     let all_generics = from_struct.generics.all();
 

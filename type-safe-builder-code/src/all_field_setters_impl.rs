@@ -18,8 +18,7 @@ fn setter_impl_for(field: &Field, from_struct: &FromStruct) -> TokenStream {
         if other_field.ident() == field.ident() {
             None
         } else {
-            let field_placeholder = other_field.field_placeholder();
-            Some(quote! {const #field_placeholder: bool})
+            Some(other_field.const_field_placeholder())
         }
     });
 
@@ -27,8 +26,7 @@ fn setter_impl_for(field: &Field, from_struct: &FromStruct) -> TokenStream {
         if other_field.ident() == field.ident() {
             quote! {false}
         } else {
-            let field_placeholder = other_field.field_placeholder();
-            quote! {#field_placeholder}
+            other_field.field_placeholder()
         }
     });
 
@@ -36,8 +34,7 @@ fn setter_impl_for(field: &Field, from_struct: &FromStruct) -> TokenStream {
         if other_field.ident() == field.ident() {
             quote! {true}
         } else {
-            let field_placeholder = other_field.field_placeholder();
-            quote! {#field_placeholder}
+            other_field.field_placeholder()
         }
     });
 

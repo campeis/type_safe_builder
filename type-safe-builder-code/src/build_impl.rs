@@ -5,10 +5,7 @@ use quote::quote;
 pub(crate) fn create(from_struct: &FromStruct) -> TokenStream {
     let all_not_default_set = from_struct.fields.iter().map(|field| {
         if field.has_default() {
-            let field_placeholder = field.field_placeholder();
-            quote! {
-                #field_placeholder
-            }
+            field.field_placeholder()
         } else {
             quote! {
                 true
@@ -18,8 +15,7 @@ pub(crate) fn create(from_struct: &FromStruct) -> TokenStream {
 
     let all_default_placeholder_fields_types = from_struct.fields.iter().filter_map(|field| {
         if field.has_default() {
-            let field_placeholder = field.field_placeholder();
-            Some(quote! {const #field_placeholder : bool})
+            Some(field.const_field_placeholder())
         } else {
             None
         }

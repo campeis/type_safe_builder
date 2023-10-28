@@ -46,8 +46,13 @@ impl Field {
         &self.ty
     }
 
-    pub(crate) fn field_placeholder(&self) -> Ident {
-        format_ident!("PLACEHOLDER{}TYPE", self.ident.to_string().to_uppercase())
+    pub(crate) fn field_placeholder(&self) -> TokenStream {
+        format_ident!("PLACEHOLDER{}TYPE", self.ident.to_string().to_uppercase()).to_token_stream()
+    }
+
+    pub(crate) fn const_field_placeholder(&self) -> TokenStream {
+        let field_placeholder = self.field_placeholder();
+        quote! {const #field_placeholder: bool}
     }
 
     pub(crate) fn has_default(&self) -> bool {
