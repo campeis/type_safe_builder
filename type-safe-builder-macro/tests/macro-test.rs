@@ -129,6 +129,22 @@ fn struct_can_be_configured_with_default_as_standard_and_mandatory_fields() {
 }
 
 #[test]
+fn field_default_with_value_works_with_struct_default() {
+    #[derive(Builder)]
+    #[builder(default)]
+    struct StructWithField {
+        f1: i64,
+        #[builder(default = 1)]
+        f2: i64,
+    }
+
+    let built = StructWithFieldBuilder::builder().build();
+
+    assert_eq!(i64::default(), built.f1);
+    assert_eq!(1, built.f2);
+}
+
+#[test]
 fn accepts_fields_with_generic_args() {
     #[derive(Builder)]
     struct StructWithField {
