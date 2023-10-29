@@ -82,6 +82,19 @@ fn default_fields_can_be_set_by_macro() {
 }
 
 #[test]
+fn default_fields_can_be_set_as_code() {
+    #[derive(Builder)]
+    struct StructWithField {
+        #[builder(default = <i64 as Default>::default() + 1)]
+        f1: i64,
+    }
+
+    let built = StructWithFieldBuilder::builder().build();
+
+    assert_eq!(<i64 as Default>::default() + 1, built.f1);
+}
+
+#[test]
 fn default_fields_can_be_overridden() {
     #[derive(Builder)]
     struct StructWithField {
