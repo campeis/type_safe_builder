@@ -31,7 +31,7 @@ pub(crate) fn create(from_struct: &FromStruct) -> TokenStream {
                 #field_name: self.#field_name.unwrap_or_default()
             },
             Some(DefaultToSet::AsValue(value)) => quote! {
-                #field_name: #value
+                #field_name: self.#field_name.unwrap_or(#value)
             },
         }
     });

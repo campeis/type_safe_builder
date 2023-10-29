@@ -113,6 +113,19 @@ fn default_fields_can_be_overridden() {
 }
 
 #[test]
+fn default_fields_with_value_can_be_overridden() {
+    #[derive(Builder)]
+    struct StructWithField {
+        #[builder(default = 10)]
+        f1: i64,
+    }
+
+    let built = StructWithFieldBuilder::builder().f1(1).build();
+
+    assert_eq!(1, built.f1);
+}
+
+#[test]
 fn struct_can_be_configured_with_default_as_standard() {
     #[derive(Builder)]
     #[builder(default)]
