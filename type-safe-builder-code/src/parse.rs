@@ -31,6 +31,7 @@ pub(crate) struct Field {
     ident: Ident,
     ty: Type,
     attrs: Vec<Attribute>,
+    is_default_as_standard: bool,
 }
 
 pub(crate) enum DefaultToSet {
@@ -59,6 +60,9 @@ impl Field {
         self.default_to_set().is_some()
     }
     pub(crate) fn default_to_set(&self) -> Option<DefaultToSet> {
+        if self.has_mandatory() {
+            return None;
+        }
         self.attrs
             .iter()
             .find(|attr| attr.path().is_ident("builder"))
@@ -87,6 +91,38 @@ impl Field {
                     Err(_) => None,
                 }
             })
+            .or_else(|| {
+                if self.is_default_as_standard {
+                    Some(DefaultToSet::AsDefault)
+                } else {
+                    None
+                }
+            })
+    }
+
+    pub(crate) fn has_mandatory(&self) -> bool {
+        self.attrs
+            .iter()
+            .find(|attr| attr.path().is_ident("builder"))
+            .and_then(|attr| {
+                let values: Result<Punctuated<Meta, Token![,]>, _> =
+                    attr.parse_args_with(Punctuated::parse_terminated);
+
+                match values {
+                    Ok(values) => values.iter().find_map(|m| match m {
+                        Meta::Path(path) => {
+                            if path.is_ident("mandatory") {
+                                Some(true)
+                            } else {
+                                None
+                            }
+                        }
+                        _ => None,
+                    }),
+                    Err(_) => None,
+                }
+            })
+            .unwrap_or_default()
     }
 }
 
@@ -139,6 +175,8 @@ impl StructGenerics {
 pub(super) fn parse(item: TokenStream) -> FromStruct {
     let ast: DeriveInput = parse2(item).unwrap();
 
+    let is_default_as_standard = has_attr_path(&ast, "default");
+
     let fields = match ast.data {
         Struct(DataStruct {
             fields: Named(FieldsNamed { ref named, .. }),
@@ -147,6 +185,7 @@ pub(super) fn parse(item: TokenStream) -> FromStruct {
             ident: field.ident.clone().unwrap(),
             ty: field.ty.clone(),
             attrs: field.attrs.clone(),
+            is_default_as_standard,
         }),
         _ => unimplemented!("Only implemented for structs"),
     }
@@ -160,4 +199,24 @@ pub(super) fn parse(item: TokenStream) -> FromStruct {
         },
         fields,
     }
+}
+
+fn has_attr_path(ast: &DeriveInput, attr_path: &str) -> bool {
+    ast.attrs
+        .iter()
+        .find(|attr| attr.path().is_ident("builder"))
+        .map(|attr| {
+            let values: Result<Punctuated<Meta, Token![,]>, _> =
+                attr.parse_args_with(Punctuated::parse_terminated);
+
+            match values {
+                Ok(values) => values.iter().any(|m| match m {
+                    Meta::Path(path) => path.is_ident(&format_ident!("{}", attr_path)),
+                    Meta::List(_) => false,
+                    Meta::NameValue(_) => false,
+                }),
+                Err(_) => false,
+            }
+        })
+        .unwrap_or_default()
 }

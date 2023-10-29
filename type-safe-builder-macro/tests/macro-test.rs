@@ -100,6 +100,35 @@ fn default_fields_can_be_overridden() {
 }
 
 #[test]
+fn struct_can_be_configured_with_default_as_standard() {
+    #[derive(Builder)]
+    #[builder(default)]
+    struct StructWithField {
+        f1: i64,
+    }
+
+    let built = StructWithFieldBuilder::builder().build();
+
+    assert_eq!(i64::default(), built.f1);
+}
+
+#[test]
+fn struct_can_be_configured_with_default_as_standard_and_mandatory_fields() {
+    #[derive(Builder)]
+    #[builder(default)]
+    struct StructWithField {
+        f1: i64,
+        #[builder(mandatory)]
+        f2: i64,
+    }
+
+    let built = StructWithFieldBuilder::builder().f2(1).build();
+
+    assert_eq!(i64::default(), built.f1);
+    assert_eq!(1, built.f2);
+}
+
+#[test]
 fn accepts_fields_with_generic_args() {
     #[derive(Builder)]
     struct StructWithField {
