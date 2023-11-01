@@ -319,3 +319,14 @@ fn works_with_const_generics() {
 
     let _built = builder.build();
 }
+
+#[test]
+fn builder_name_can_be_changed() {
+    #[derive(Builder)]
+    #[builder(name=CustomBuilder)]
+    struct Struct {}
+
+    let builder = CustomBuilder::builder();
+
+    let _built = builder.build();
+}

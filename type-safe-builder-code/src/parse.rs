@@ -12,6 +12,7 @@ pub(crate) struct FromStruct {
     pub(crate) ident: Ident,
     pub(crate) generics: StructGenerics,
     pub(crate) fields: Vec<Field>,
+    builder_ident_name: Option<Ident>,
 }
 
 impl FromStruct {
@@ -19,11 +20,16 @@ impl FromStruct {
         &self.ident
     }
     pub(crate) fn builder_ident(&self) -> Ident {
-        format_ident!("{}Builder", self.ident)
+        self.builder_ident_name
+            .clone()
+            .unwrap_or_else(|| format_ident!("{}Builder", self.ident))
     }
 
     pub(crate) fn builder_state_ident(&self) -> Ident {
-        format_ident!("{}BuilderState", self.ident)
+        self.builder_ident_name
+            .clone()
+            .map(|builder_ident| format_ident!("{}State", builder_ident))
+            .unwrap_or_else(|| format_ident!("{}BuilderState", self.ident))
     }
 }
 
@@ -191,6 +197,8 @@ pub(super) fn parse(item: TokenStream) -> FromStruct {
     }
     .collect::<Vec<_>>();
 
+    let builder_ident_name = get_attr_value(&ast, "name");
+
     FromStruct {
         ident: ast.ident,
         generics: StructGenerics {
@@ -198,6 +206,7 @@ pub(super) fn parse(item: TokenStream) -> FromStruct {
             where_clause: ast.generics.where_clause,
         },
         fields,
+        builder_ident_name,
     }
 }
 
@@ -219,4 +228,30 @@ fn has_attr_path(ast: &DeriveInput, attr_path: &str) -> bool {
             }
         })
         .unwrap_or_default()
+}
+
+fn get_attr_value(ast: &DeriveInput, key: &str) -> Option<Ident> {
+    ast.attrs
+        .iter()
+        .find(|attr| attr.path().is_ident("builder"))
+        .iter()
+        .find_map(|attr| {
+            let values: Result<Punctuated<Meta, Token![,]>, _> =
+                attr.parse_args_with(Punctuated::parse_terminated);
+
+            match values {
+                Ok(values) => values.iter().find_map(|m| match m {
+                    Meta::Path(_) => None,
+                    Meta::List(_) => None,
+                    Meta::NameValue(nv) => {
+                        if nv.path.is_ident(key) {
+                            Some(format_ident!("{}", nv.value.to_token_stream().to_string()))
+                        } else {
+                            None
+                        }
+                    }
+                }),
+                Err(_) => None,
+            }
+        })
 }
