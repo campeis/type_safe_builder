@@ -15,7 +15,7 @@ fn setter_impl_for(field: &Field, from_struct: &FromStruct) -> TokenStream {
     let field_type = field.ty();
 
     let other_placeholder_field_type_ident = from_struct.fields.iter().filter_map(|other_field| {
-        if other_field.ident() == field.ident() {
+        if other_field.ident() == field.ident() && !field.has_multi() {
             None
         } else {
             Some(other_field.const_field_placeholder())
@@ -23,7 +23,7 @@ fn setter_impl_for(field: &Field, from_struct: &FromStruct) -> TokenStream {
     });
 
     let input_placeholder_field_type_ident = from_struct.fields.iter().map(|other_field| {
-        if other_field.ident() == field.ident() {
+        if other_field.ident() == field.ident() && !field.has_multi() {
             quote! {false}
         } else {
             other_field.field_placeholder()

@@ -107,6 +107,14 @@ impl Field {
     }
 
     pub(crate) fn has_mandatory(&self) -> bool {
+        self.has_attr_path("mandatory")
+    }
+
+    pub(crate) fn has_multi(&self) -> bool {
+        self.has_attr_path("multi")
+    }
+
+    fn has_attr_path(&self, path_to_find: &'static str) -> bool {
         self.attrs
             .iter()
             .find(|attr| attr.path().is_ident("builder"))
@@ -117,7 +125,7 @@ impl Field {
                 match values {
                     Ok(values) => values.iter().find_map(|m| match m {
                         Meta::Path(path) => {
-                            if path.is_ident("mandatory") {
+                            if path.is_ident(path_to_find) {
                                 Some(true)
                             } else {
                                 None

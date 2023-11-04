@@ -330,3 +330,24 @@ fn builder_name_can_be_changed() {
 
     let _built = builder.build();
 }
+
+#[test]
+fn values_could_be_set_multiple_times() {
+    #[derive(Builder)]
+    struct Struct {
+        #[builder(multi)]
+        f1: i64,
+        #[builder(multi, default)]
+        f2: i64,
+        #[builder(multi, default)]
+        f3: i64,
+    }
+
+    let builder = StructBuilder::builder().f1(1).f1(2).f2(3).f2(4);
+
+    let built = builder.build();
+
+    assert_eq!(2, built.f1);
+    assert_eq!(4, built.f2);
+    assert_eq!(<i64 as Default>::default(), built.f3);
+}
