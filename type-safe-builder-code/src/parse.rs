@@ -112,7 +112,11 @@ impl Field {
     }
 
     pub(crate) fn has_multi(&self) -> bool {
-        self.is_default_as_multi || self.has_attr_path("multi")
+        (self.is_default_as_multi && !self.has_single()) || self.has_attr_path("multi")
+    }
+
+    pub(crate) fn has_single(&self) -> bool {
+        self.has_attr_path("single")
     }
 
     fn has_attr_path(&self, path_to_find: &'static str) -> bool {

@@ -366,3 +366,22 @@ fn values_could_be_set_multiple_times_if_set_at_struct_level() {
 
     assert_eq!(2, built.f1);
 }
+
+#[test]
+fn if_multi_assignment_is_allowed_by_default_field_can_be_configured_so_it_can_be_assigned_only_once(
+) {
+    #[derive(Builder)]
+    #[builder(multi)]
+    struct Struct {
+        f1: i64,
+        #[builder(single)]
+        f2: i64,
+    }
+
+    let builder = StructBuilder::builder().f1(1).f1(2).f2(3);
+
+    let built = builder.build();
+
+    assert_eq!(2, built.f1);
+    assert_eq!(3, built.f2);
+}
