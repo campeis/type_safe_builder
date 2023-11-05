@@ -351,3 +351,18 @@ fn values_could_be_set_multiple_times() {
     assert_eq!(4, built.f2);
     assert_eq!(<i64 as Default>::default(), built.f3);
 }
+
+#[test]
+fn values_could_be_set_multiple_times_if_set_at_struct_level() {
+    #[derive(Builder)]
+    #[builder(multi)]
+    struct Struct {
+        f1: i64,
+    }
+
+    let builder = StructBuilder::builder().f1(1).f1(2);
+
+    let built = builder.build();
+
+    assert_eq!(2, built.f1);
+}

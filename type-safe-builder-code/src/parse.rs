@@ -38,6 +38,7 @@ pub(crate) struct Field {
     ty: Type,
     attrs: Vec<Attribute>,
     is_default_as_standard: bool,
+    is_default_as_multi: bool,
 }
 
 pub(crate) enum DefaultToSet {
@@ -111,7 +112,7 @@ impl Field {
     }
 
     pub(crate) fn has_multi(&self) -> bool {
-        self.has_attr_path("multi")
+        self.is_default_as_multi || self.has_attr_path("multi")
     }
 
     fn has_attr_path(&self, path_to_find: &'static str) -> bool {
@@ -190,6 +191,7 @@ pub(super) fn parse(item: TokenStream) -> FromStruct {
     let ast: DeriveInput = parse2(item).unwrap();
 
     let is_default_as_standard = has_attr_path(&ast, "default");
+    let is_default_as_multi = has_attr_path(&ast, "multi");
 
     let fields = match ast.data {
         Struct(DataStruct {
@@ -200,6 +202,7 @@ pub(super) fn parse(item: TokenStream) -> FromStruct {
             ty: field.ty.clone(),
             attrs: field.attrs.clone(),
             is_default_as_standard,
+            is_default_as_multi,
         }),
         _ => unimplemented!("Only implemented for structs"),
     }
