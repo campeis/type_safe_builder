@@ -107,7 +107,7 @@ impl Field {
             })
     }
 
-    pub(crate) fn has_mandatory(&self) -> bool {
+    fn has_mandatory(&self) -> bool {
         self.has_attr_path("mandatory")
     }
 
@@ -115,7 +115,7 @@ impl Field {
         (self.is_default_as_multi && !self.has_single()) || self.has_attr_path("multi")
     }
 
-    pub(crate) fn has_single(&self) -> bool {
+    fn has_single(&self) -> bool {
         self.has_attr_path("single")
     }
 
