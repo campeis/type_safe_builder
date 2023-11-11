@@ -74,36 +74,10 @@ impl Field {
         if self.has_mandatory() {
             return None;
         }
-        self.attrs
-            .iter()
-            .find(|attr| attr.path().is_ident("builder"))
-            .and_then(|attr| {
-                let values: Result<Punctuated<Meta, Token![,]>, _> =
-                    attr.parse_args_with(Punctuated::parse_terminated);
-
-                match values {
-                    Ok(values) => values.iter().find_map(|m| match m {
-                        Meta::Path(path) => {
-                            if path.is_ident("default") {
-                                Some(DefaultToSet::AsDefault)
-                            } else {
-                                None
-                            }
-                        }
-                        Meta::List(_) => None,
-                        Meta::NameValue(nv) => {
-                            if nv.path.is_ident("default") {
-                                Some(DefaultToSet::AsValue(nv.value.to_token_stream()))
-                            } else {
-                                None
-                            }
-                        }
-                    }),
-                    Err(_) => None,
-                }
-            })
+        self.get_attr_value("default")
+            .map(DefaultToSet::AsValue)
             .or_else(|| {
-                if self.is_default_as_standard {
+                if self.has_attr_path("default") || self.is_default_as_standard {
                     Some(DefaultToSet::AsDefault)
                 } else {
                     None
