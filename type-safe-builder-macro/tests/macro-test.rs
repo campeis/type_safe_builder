@@ -332,6 +332,22 @@ fn builder_name_can_be_changed() {
 }
 
 #[test]
+fn setter_name_can_be_customized() {
+    #[derive(Builder)]
+    #[builder(name=CustomBuilder)]
+    struct Struct {
+        #[builder(setter_name=custom_setter)]
+        f1: i64,
+    }
+
+    let builder = CustomBuilder::builder();
+
+    let built = builder.custom_setter(1).build();
+
+    assert_eq!(1, built.f1);
+}
+
+#[test]
 fn values_could_be_set_multiple_times() {
     #[derive(Builder)]
     struct Struct {

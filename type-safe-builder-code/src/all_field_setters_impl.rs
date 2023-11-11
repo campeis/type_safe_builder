@@ -1,6 +1,6 @@
 use crate::parse::{Field, FromStruct};
 use proc_macro2::TokenStream;
-use quote::quote;
+use quote::{quote, ToTokens};
 
 pub(super) fn create(from_struct: &FromStruct) -> Vec<TokenStream> {
     from_struct
@@ -12,6 +12,9 @@ pub(super) fn create(from_struct: &FromStruct) -> Vec<TokenStream> {
 
 fn setter_impl_for(field: &Field, from_struct: &FromStruct) -> TokenStream {
     let field_ident = field.ident();
+    let setter_ident = field
+        .setter_ident()
+        .unwrap_or(field.ident().to_token_stream());
     let field_type = field.ty();
 
     let other_placeholder_field_type_ident = from_struct.fields.iter().filter_map(|other_field| {
@@ -57,7 +60,7 @@ fn setter_impl_for(field: &Field, from_struct: &FromStruct) -> TokenStream {
     let builder_state_ident = from_struct.builder_state_ident();
     quote! {
         impl<#(#generics,)*#(#other_placeholder_field_type_ident,)*> #builder_state_ident<#(#all_generics_names1,)*#(#input_placeholder_field_type_ident,)*> #where_clause {
-        fn #field_ident(self, value: #field_type) -> #builder_state_ident<#(#all_generics_names2,)*#(#output_placeholder_field_type_ident,)*> {
+        fn #setter_ident(self, value: #field_type) -> #builder_state_ident<#(#all_generics_names2,)*#(#output_placeholder_field_type_ident,)*> {
             #builder_state_ident {
                 #field_ident: Some(value),
                 #(#copy_other_fields,)*

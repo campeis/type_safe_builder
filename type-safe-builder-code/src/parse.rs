@@ -50,6 +50,10 @@ impl Field {
         &self.ident
     }
 
+    pub(crate) fn setter_ident(&self) -> Option<TokenStream> {
+        self.get_attr_value("setter_name")
+    }
+
     pub(crate) fn ty(&self) -> &Type {
         &self.ty
     }
@@ -142,6 +146,30 @@ impl Field {
                 }
             })
             .unwrap_or_default()
+    }
+
+    fn get_attr_value(&self, attr_key: &'static str) -> Option<TokenStream> {
+        self.attrs
+            .iter()
+            .find(|attr| attr.path().is_ident("builder"))
+            .and_then(|attr| {
+                let values: Result<Punctuated<Meta, Token![,]>, _> =
+                    attr.parse_args_with(Punctuated::parse_terminated);
+
+                match values {
+                    Ok(values) => values.iter().find_map(|m| match m {
+                        Meta::NameValue(nv) => {
+                            if nv.path.is_ident(attr_key) {
+                                Some(nv.value.to_token_stream())
+                            } else {
+                                None
+                            }
+                        }
+                        _ => None,
+                    }),
+                    Err(_) => None,
+                }
+            })
     }
 }
 
