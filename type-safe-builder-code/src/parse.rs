@@ -98,52 +98,11 @@ impl Field {
     }
 
     fn has_attr_path(&self, path_to_find: &'static str) -> bool {
-        self.attrs
-            .iter()
-            .find(|attr| attr.path().is_ident("builder"))
-            .and_then(|attr| {
-                let values: Result<Punctuated<Meta, Token![,]>, _> =
-                    attr.parse_args_with(Punctuated::parse_terminated);
-
-                match values {
-                    Ok(values) => values.iter().find_map(|m| match m {
-                        Meta::Path(path) => {
-                            if path.is_ident(path_to_find) {
-                                Some(true)
-                            } else {
-                                None
-                            }
-                        }
-                        _ => None,
-                    }),
-                    Err(_) => None,
-                }
-            })
-            .unwrap_or_default()
+        has_attr_path(&self.attrs, path_to_find)
     }
 
-    fn get_attr_value(&self, attr_key: &'static str) -> Option<TokenStream> {
-        self.attrs
-            .iter()
-            .find(|attr| attr.path().is_ident("builder"))
-            .and_then(|attr| {
-                let values: Result<Punctuated<Meta, Token![,]>, _> =
-                    attr.parse_args_with(Punctuated::parse_terminated);
-
-                match values {
-                    Ok(values) => values.iter().find_map(|m| match m {
-                        Meta::NameValue(nv) => {
-                            if nv.path.is_ident(attr_key) {
-                                Some(nv.value.to_token_stream())
-                            } else {
-                                None
-                            }
-                        }
-                        _ => None,
-                    }),
-                    Err(_) => None,
-                }
-            })
+    fn get_attr_value(&self, key: &'static str) -> Option<TokenStream> {
+        get_attr_value(&self.attrs, key)
     }
 }
 
@@ -196,8 +155,8 @@ impl StructGenerics {
 pub(super) fn parse(item: TokenStream) -> FromStruct {
     let ast: DeriveInput = parse2(item).unwrap();
 
-    let is_default_as_standard = has_attr_path(&ast, "default");
-    let is_default_as_multi = has_attr_path(&ast, "multi");
+    let is_default_as_standard = has_attr_path(&ast.attrs, "default");
+    let is_default_as_multi = has_attr_path(&ast.attrs, "multi");
 
     let fields = match ast.data {
         Struct(DataStruct {
@@ -214,7 +173,8 @@ pub(super) fn parse(item: TokenStream) -> FromStruct {
     }
     .collect::<Vec<_>>();
 
-    let builder_ident_name = get_attr_value(&ast, "name");
+    let builder_ident_name =
+        get_attr_value(&ast.attrs, "name").map(|ts| format_ident!("{}", ts.to_string()));
 
     FromStruct {
         ident: ast.ident,
@@ -227,8 +187,8 @@ pub(super) fn parse(item: TokenStream) -> FromStruct {
     }
 }
 
-fn has_attr_path(ast: &DeriveInput, attr_path: &str) -> bool {
-    ast.attrs
+fn has_attr_path(attrs: &[Attribute], attr_path: &str) -> bool {
+    attrs
         .iter()
         .find(|attr| attr.path().is_ident("builder"))
         .map(|attr| {
@@ -247,8 +207,8 @@ fn has_attr_path(ast: &DeriveInput, attr_path: &str) -> bool {
         .unwrap_or_default()
 }
 
-fn get_attr_value(ast: &DeriveInput, key: &str) -> Option<Ident> {
-    ast.attrs
+fn get_attr_value(attrs: &[Attribute], key: &str) -> Option<TokenStream> {
+    attrs
         .iter()
         .find(|attr| attr.path().is_ident("builder"))
         .iter()
@@ -262,7 +222,7 @@ fn get_attr_value(ast: &DeriveInput, key: &str) -> Option<Ident> {
                     Meta::List(_) => None,
                     Meta::NameValue(nv) => {
                         if nv.path.is_ident(key) {
-                            Some(format_ident!("{}", nv.value.to_token_stream().to_string()))
+                            Some(nv.value.to_token_stream())
                         } else {
                             None
                         }
