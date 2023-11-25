@@ -374,13 +374,15 @@ fn values_could_be_set_multiple_times_if_set_at_struct_level() {
     #[builder(multi)]
     struct Struct {
         f1: i64,
+        f2: i64,
     }
 
-    let builder = StructBuilder::builder().f1(1).f1(2);
+    let builder = StructBuilder::builder().f1(1).f1(2).f2(3).f2(4);
 
     let built = builder.build();
 
     assert_eq!(2, built.f1);
+    assert_eq!(4, built.f2);
 }
 
 #[test]
