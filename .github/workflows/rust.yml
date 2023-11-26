@@ -2,7 +2,7 @@ name: Rust
 
 on:
   push:
-    branches: [ "main" , "fix-GitHub-Actions-try_build-differences"]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
