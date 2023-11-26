@@ -1,7 +1,7 @@
 # type_safe_builder
 A typesafe builder macro in Rust
 
-The generated builder will make sure a struct can't be generated if any of the required fields has not been set.
+The generated builder will make sure a struct can't be built if any of the required fields has not been set.
 
 ```rust
 use type_safe_builder_macro::Builder;
