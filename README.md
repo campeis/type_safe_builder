@@ -2,6 +2,7 @@
 A typesafe builder macro in Rust
 
 The generated builder will make sure a struct can't be built if any of the required fields has not been set.
+The check will be done at compile time, so there will be no need to handle any error in the code.
 
 ```rust
 use type_safe_builder_macro::Builder;
