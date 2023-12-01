@@ -158,6 +158,28 @@ fn main() {
 ```
 
 ### Allow field value to be set multiple times
+By default the builder will not allow a field to be set multiple times.
+
+Because of this the following code would not compile.
+
+```rust
+use type_safe_builder_macro::Builder;
+
+#[derive(Builder)]
+struct Struct {
+    field: String,
+}
+
+fn main() {
+    let build = StructBuilder::builder()
+        .field("value".into())
+        .field("another value".into()) //this will mot compile
+        .build();
+}
+```
+
+This behaviour could be changed on a field by field basis.
+
 ```rust
 use type_safe_builder_macro::Builder;
 
