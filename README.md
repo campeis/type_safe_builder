@@ -38,22 +38,6 @@ fn main() {
 }
 ```
 
-### Basic usage
-```rust
-use type_safe_builder_macro::Builder;
-
-#[derive(Builder)]
-struct Struct {
-    field: String,
-}
-
-fn main() {
-    let build = StructBuilder::builder()
-        .field("value".into())
-        .build();
-}
-```
-
 ### Default fields
 ```rust
 use type_safe_builder_macro::Builder;
