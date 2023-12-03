@@ -39,6 +39,10 @@ fn main() {
 ```
 
 ### Default fields
+If a field is of a type that implemets the Default trait it could be configured
+so the default() provided value could be used automatically whithout the need to
+call the field's setter method.
+
 ```rust
 use type_safe_builder_macro::Builder;
 
