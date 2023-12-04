@@ -61,6 +61,11 @@ fn main() {
 ```
 
 ### Default fields value override
+
+If the field type does't implement Default, or the wanted value is different from the one
+provided by default(), a specific value could be configured to be used without the need
+to explicitly call the setter.
+
 ```rust
 use type_safe_builder_macro::Builder;
 
