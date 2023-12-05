@@ -120,6 +120,11 @@ fn main() {
 ```
 
 ### Custom builder name
+
+By default the name of the builder will be the word "Builder" prefixed with the name of 
+struct that will be built. In the case this generated name would clash with the one of
+an existing struct, a different one could be configured.
+
 ```rust
 use type_safe_builder_macro::Builder;
 
