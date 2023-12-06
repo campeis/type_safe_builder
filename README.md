@@ -139,6 +139,11 @@ fn main() {
 ```
 
 ### Custom setter name
+
+By default the builder has a setter method with the same name as the property
+it will set. This could be configured on a field basis so the generated setter
+method has a specific name.
+
 ```rust
 use type_safe_builder_macro::Builder;
 
