@@ -50,7 +50,7 @@ use type_safe_builder_macro::Builder;
 struct Struct {
     field: String,
     #[builder(default)]
-    default_field: Option<String>,
+    default_field: Option<&'static str>,
 }
 
 fn main() {
