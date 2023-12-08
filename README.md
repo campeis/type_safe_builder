@@ -222,6 +222,9 @@ fn main() {
 ```
 
 ### Allow field value to be set multiple times set at the struct level can be disabled for specific fields
+
+If convenient this could be made the default behaviour for all the fields.
+
 ```rust
 use type_safe_builder_macro::Builder;
 
