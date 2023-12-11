@@ -84,6 +84,10 @@ fn main() {
 ```
 
 ### All Default fields in the struct
+
+If all fields of the struct to be built have valid Default implementwtion, the use of 
+default() for all the fields could be set at struct level.
+
 ```rust
 use type_safe_builder_macro::Builder;
 
