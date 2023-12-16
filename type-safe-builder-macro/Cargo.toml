@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 type-safe-builder-code = { path = "../type-safe-builder-code" }
 [dev-dependencies]
-trybuild = "1.0.80"
+trybuild = "1.0.85"
 
 [lib]
 proc-macro = true
