@@ -5,3 +5,4 @@ updates:
     schedule:
       interval: "weekly"
       day: "saturday"
+      time: "05:00"
