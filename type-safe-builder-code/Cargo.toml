@@ -7,5 +7,5 @@ edition = "2021"
 
 [dependencies]
 quote = "1.0.33"
-syn = "2.0.41"
-proc-macro2 = "1.0.70"
+syn = "2.0.42"
+proc-macro2 = "1.0.71"
