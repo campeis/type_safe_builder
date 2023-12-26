@@ -1,0 +1,10 @@
+error[E0599]: no method named `field` found for struct `StructToBuildBuilderState<true>` in the current scope
+ --> tests/compile_failure/assign_field_twice.rs:9:54
+  |
+3 | #[derive(Builder)]
+  |          ------- method `field` not found for this struct
+...
+9 |     let _ = StructToBuildBuilder::builder().field(1).field(2).build();
+  |                                                      ^^^^^--- help: remove the arguments
+  |                                                      |
+  |                                                      field, not a method
