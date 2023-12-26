@@ -1,9 +1,7 @@
 use type_safe_builder_macro::Builder;
 
 #[derive(Builder)]
-#[builder(multi)]
 struct StructToBuild {
-    #[builder(single)]
     field: i64,
 }
 
