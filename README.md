@@ -239,16 +239,23 @@ use type_safe_builder_macro::Builder;
 #[derive(Builder)]
 #[builder(multi)]
 struct Struct {
-    #[builder(single)]
     field: String,
+    #[builder(single)]
     other_field: String,
 }
 
 fn main() {
     let build = StructBuilder::builder()
-        .field("this can't be overridden".into())
-        .other_field("value for other field".into())
-        .other_field("value that will override the value of other_field".into())
+        .field("value for field".into())
+        .field("value that will override the value of field".into())
+        .other_field("this can't be overridden".into())
+        .build(); // this will work
+    
+    let build = StructBuilder::builder()
+        .field("value for field".into())
+        .field("value that will override the value of field".into())
+        .other_field("this can't be overridden".into())
+        .other_field("trying to overrid the value".into()) // this will not compile
         .build();
 }
 ```
