@@ -2,7 +2,7 @@ use crate::parse::FromStruct;
 use proc_macro2::TokenStream;
 use quote::quote;
 
-pub(super) fn create(from_struct: &FromStruct) -> TokenStream {
+pub(crate) fn create(from_struct: &FromStruct) -> TokenStream {
     let all_unset_fields = from_struct.fields.iter().map(|field| {
         let field_ident = &field.ident();
 

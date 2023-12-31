@@ -2,7 +2,7 @@ use crate::parse::FromStruct;
 use proc_macro2::TokenStream;
 use quote::quote;
 
-pub(super) fn create(from_struct: &FromStruct) -> TokenStream {
+pub(crate) fn create(from_struct: &FromStruct) -> TokenStream {
     let state_fields_declarations = from_struct.fields.iter().map(|field| {
         let field_ident = field.ident();
         let field_type = field.ty();
