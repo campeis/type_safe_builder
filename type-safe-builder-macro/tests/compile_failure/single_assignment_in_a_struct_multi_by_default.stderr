@@ -5,6 +5,7 @@ error[E0599]: no method named `field` found for struct `StructToBuildBuilderStat
    |          ------- method `field` not found for this struct
 ...
 11 |     let _ = StructToBuildBuilder::builder().field(1).field(2).build();
-   |                                                      ^^^^^--- help: remove the arguments
-   |                                                      |
-   |                                                      field, not a method
+   |             -------------------------------          ^^^^^--- help: remove the arguments
+   |             |                                        |
+   |             |                                        field, not a method
+   |             method `field` is available on `StructToBuildBuilderState<false>`
