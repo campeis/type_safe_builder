@@ -230,7 +230,7 @@ fn main() {
 
 ### Allow field value to be set multiple times set at the struct level can be disabled for specific fields
 
-If the possinility to assign a value to a field multiple is made the default for a structure, individual fields
+If the possibility to assign a value to a field multiple times is made the default for a structure, individual fields
 could be configure so they could be assigned just once.
 
 ```rust
