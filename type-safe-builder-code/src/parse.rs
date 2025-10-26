@@ -1,11 +1,11 @@
 use proc_macro2::{Ident, TokenStream};
-use quote::{format_ident, quote, ToTokens};
-use syn::punctuated::Punctuated;
+use quote::{ToTokens, format_ident, quote};
 use syn::Data::Struct;
 use syn::Fields::Named;
+use syn::punctuated::Punctuated;
 use syn::{
-    parse2, Attribute, DataStruct, DeriveInput, FieldsNamed, GenericParam, Meta, Token, Type,
-    WhereClause,
+    Attribute, DataStruct, DeriveInput, FieldsNamed, GenericParam, Meta, Token, Type, WhereClause,
+    parse2,
 };
 
 pub(crate) struct FromStruct {
@@ -134,7 +134,7 @@ impl StructGenerics {
     pub(crate) fn all_names(&self) -> Vec<TokenStream> {
         self.generics
             .iter()
-            .map(|gen| match gen {
+            .map(|generic_param| match generic_param {
                 GenericParam::Lifetime(l) => {
                     let l = &l.lifetime;
                     quote! {#l}
