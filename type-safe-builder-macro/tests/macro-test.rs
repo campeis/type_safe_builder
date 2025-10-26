@@ -386,8 +386,8 @@ fn values_could_be_set_multiple_times_if_set_at_struct_level() {
 }
 
 #[test]
-fn if_multi_assignment_is_allowed_by_default_field_can_be_configured_so_it_can_be_assigned_only_once(
-) {
+fn if_multi_assignment_is_allowed_by_default_field_can_be_configured_so_it_can_be_assigned_only_once()
+ {
     #[derive(Builder)]
     #[builder(multi)]
     struct Struct {

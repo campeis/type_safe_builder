@@ -1,6 +1,6 @@
 use crate::parse::{Field, FromStruct};
 use proc_macro2::TokenStream;
-use quote::{quote, ToTokens};
+use quote::{ToTokens, quote};
 
 pub(crate) fn create(from_struct: &FromStruct) -> Vec<TokenStream> {
     from_struct
