@@ -24,7 +24,7 @@ error[E0277]: the trait bound `StructWithoutRequiredTrait: TraitForField` is not
 note: required by a bound in `GenericStructBuilder::builder`
   --> tests/compile_failure/not_respecting_where_clause.rs:10:8
    |
- 7 | #[derive(Builder)]
+7  | #[derive(Builder)]
    |          ------- required by a bound in this associated function
 ...
 10 |     T: TraitForField,
