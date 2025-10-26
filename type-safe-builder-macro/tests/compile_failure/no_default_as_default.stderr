@@ -1,20 +1,14 @@
 error[E0277]: the trait bound `WithNoDefault: Default` is not satisfied
  --> tests/compile_failure/no_default_as_default.rs:6:10
   |
-   6 | #[derive(Builder)]
-     |          ^^^^^^^ the trait `Default` is not implemented for `WithNoDefault`
-     |
+6 | #[derive(Builder)]
+  |          ^^^^^^^ the trait `Default` is not implemented for `WithNoDefault`
+  |
 note: required by a bound in `Option::<T>::unwrap_or_default`
-    --> $RUST/core/src/option.rs
-     |
-     |     pub const fn unwrap_or_default(self) -> T
-     |                  ----------------- required by a bound in this associated function
-     |     where
-     |         T: ~const Default,
-     |            ^^^^^^^^^^^^^^ required by this bound in `Option::<T>::unwrap_or_default`
-     = note: this error originates in the derive macro `Builder` (in Nightly builds, run with -Z macro-backtrace for more info)
+ --> $RUST/core/src/option.rs
+  = note: this error originates in the derive macro `Builder` (in Nightly builds, run with -Z macro-backtrace for more info)
 help: consider annotating `WithNoDefault` with `#[derive(Default)]`
-     |
-   3 + #[derive(Default)]
-   4 | struct WithNoDefault {
-     |
+  |
+3 + #[derive(Default)]
+4 | struct WithNoDefault {
+  |
