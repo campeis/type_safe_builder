@@ -1,6 +1,6 @@
 error[E0277]: the trait bound `WithNoDefault: Default` is not satisfied
  --> tests/compile_failure/no_default_as_default.rs:6:10
-  |
+     |
    6 | #[derive(Builder)]
      |          ^^^^^^^ the trait `Default` is not implemented for `WithNoDefault`
      |

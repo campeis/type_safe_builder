@@ -1,6 +1,6 @@
 error[E0599]: no method named `build` found for struct `StructToBuildBuilderState<false>` in the current scope
  --> tests/compile_failure/default_as_standard_with_mandatory_field_not_set.rs:11:45
-  |
+   |
  3 | #[derive(Builder)]
    |          ------- method `build` not found for this struct
 ...
