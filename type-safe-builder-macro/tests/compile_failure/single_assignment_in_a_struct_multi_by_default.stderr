@@ -1,6 +1,6 @@
 error[E0599]: no method named `field` found for struct `StructToBuildBuilderState<true>` in the current scope
- --> tests/compile_failure/single_assignment_in_a_struct_multi_by_default.rs:11:54
-  |
+  --> tests/compile_failure/single_assignment_in_a_struct_multi_by_default.rs:11:54
+   |
  3 | #[derive(Builder)]
    |          ------- method `field` not found for this struct
 ...
