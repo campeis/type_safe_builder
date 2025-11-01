@@ -2,8 +2,13 @@ error[E0277]: the trait bound `StructWithoutRequiredTrait: TraitForField` is not
   --> tests/compile_failure/not_respecting_where_clause.rs:17:52
    |
 17 |     let _builder = GenericStructBuilder::builder().f1(StructWithoutRequiredTrait {});
-   |                                                    ^^ the trait `TraitForField` is not implemented for `StructWithoutRequiredTrait`
+   |                                                    ^^ unsatisfied trait bound
    |
+help: the trait `TraitForField` is not implemented for `StructWithoutRequiredTrait`
+  --> tests/compile_failure/not_respecting_where_clause.rs:15:1
+   |
+15 | struct StructWithoutRequiredTrait {}
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    = help: the trait `TraitForField` is implemented for `FieldStruct`
 note: required by a bound in `GenericStructBuilderState::<T, false>::f1`
   --> tests/compile_failure/not_respecting_where_clause.rs:10:8
@@ -18,8 +23,13 @@ error[E0277]: the trait bound `StructWithoutRequiredTrait: TraitForField` is not
   --> tests/compile_failure/not_respecting_where_clause.rs:17:20
    |
 17 |     let _builder = GenericStructBuilder::builder().f1(StructWithoutRequiredTrait {});
-   |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ the trait `TraitForField` is not implemented for `StructWithoutRequiredTrait`
+   |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unsatisfied trait bound
    |
+help: the trait `TraitForField` is not implemented for `StructWithoutRequiredTrait`
+  --> tests/compile_failure/not_respecting_where_clause.rs:15:1
+   |
+15 | struct StructWithoutRequiredTrait {}
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
    = help: the trait `TraitForField` is implemented for `FieldStruct`
 note: required by a bound in `GenericStructBuilder::builder`
   --> tests/compile_failure/not_respecting_where_clause.rs:10:8
